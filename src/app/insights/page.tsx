@@ -157,7 +157,7 @@ export default function Insights() {
       ? highSugarEntries.reduce((sum, e) => sum + e.mood.value, 0) / highSugarEntries.length 
       : 0;
     
-    let insights = [];
+    const insights = [];
     
     // Add general insights
     insights.push(`Your average mood is ${averages[0].value.toFixed(1)} out of 8.`);

@@ -2,7 +2,12 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/h-tracker';
 
-let cached = (global as any).mongoose || { conn: null, promise: null };
+interface CachedConnection {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+const cached: CachedConnection = (global as { mongoose?: CachedConnection }).mongoose || { conn: null, promise: null };
 
 export async function connectToDatabase() {
   if (cached.conn) {

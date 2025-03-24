@@ -2,19 +2,11 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Entry from '@/models/Entry';
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
-
 // GET - Get a specific entry by ID
-export async function GET(req: Request, { params }: Params) {
+export async function GET(_: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = params;
     await connectToDatabase();
-    
-    const entry = await Entry.findById(id);
+    const entry = await Entry.findById(params.id);
     
     if (!entry) {
       return NextResponse.json(
@@ -34,15 +26,13 @@ export async function GET(req: Request, { params }: Params) {
 }
 
 // PUT - Update an existing entry
-export async function PUT(req: Request, { params }: Params) {
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = params;
-    const body = await req.json();
-    
+    const body = await request.json();
     await connectToDatabase();
     
     const updatedEntry = await Entry.findByIdAndUpdate(
-      id,
+      params.id,
       { ...body },
       { new: true, runValidators: true }
     );
@@ -65,12 +55,10 @@ export async function PUT(req: Request, { params }: Params) {
 }
 
 // DELETE - Delete an entry
-export async function DELETE(req: Request, { params }: Params) {
+export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = params;
     await connectToDatabase();
-    
-    const deletedEntry = await Entry.findByIdAndDelete(id);
+    const deletedEntry = await Entry.findByIdAndDelete(params.id);
     
     if (!deletedEntry) {
       return NextResponse.json(

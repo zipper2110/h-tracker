@@ -1,0 +1,4 @@
+username: leetvin
+pass: oUYEfYFD5KPNvMLI
+
+mongodb+srv://leetvin:<db_password>@cluster0.fzvtn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0

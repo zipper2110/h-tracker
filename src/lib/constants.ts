@@ -5,7 +5,7 @@ export interface LevelOption {
   label: string;
 }
 
-export const MOOD_LEVELS: LevelOption[] = [
+export const SELF_FEELING_LEVELS: LevelOption[] = [
   { value: 0, label: "totally awful" },
   { value: 1, label: "very bad" },
   { value: 2, label: "bad" },
@@ -34,4 +34,23 @@ export const SWEET_FOOD_LEVELS: LevelOption[] = [
   { value: 4, label: "big chunk" },
   { value: 5, label: "a lot" },
   { value: 6, label: "over the top" }
+];
+
+export const OVEREATING_LEVELS: LevelOption[] = [
+  { value: 0, label: "not at all" },
+  { value: 1, label: "a bit" },
+  { value: 2, label: "moderately" },
+  { value: 3, label: "on a larger side" },
+  { value: 4, label: "a lot" },
+  { value: 5, label: "over the top" }
+];
+
+export const SLEEP_RECOVERY_LEVELS: LevelOption[] = [
+  { value: 0, label: "super-poorly" },
+  { value: 1, label: "poorly" },
+  { value: 2, label: "not cool" },
+  { value: 3, label: "okay" },
+  { value: 4, label: "nice" },
+  { value: 5, label: "good" },
+  { value: 6, label: "excellent" }
 ]; 

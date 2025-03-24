@@ -7,9 +7,11 @@ export interface LevelData {
 
 export interface IEntry extends Document {
   date: Date;
-  mood: LevelData;
+  selfFeeling: LevelData;
   activity: LevelData;
   sweetFood: LevelData;
+  overeating: LevelData;
+  sleepRecovery: LevelData;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,7 +22,7 @@ const EntrySchema: Schema = new Schema({
     required: true,
     index: true
   },
-  mood: {
+  selfFeeling: {
     value: {
       type: Number,
       required: true,
@@ -45,6 +47,30 @@ const EntrySchema: Schema = new Schema({
     }
   },
   sweetFood: {
+    value: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 6
+    },
+    label: {
+      type: String,
+      required: true
+    }
+  },
+  overeating: {
+    value: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 5
+    },
+    label: {
+      type: String,
+      required: true
+    }
+  },
+  sleepRecovery: {
     value: {
       type: Number,
       required: true,

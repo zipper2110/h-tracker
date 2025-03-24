@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     
     // Validate the entry
-    if (!body.date || !body.mood || !body.activity || !body.sweetFood) {
+    if (!body.date || !body.selfFeeling || !body.activity || !body.sweetFood) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }

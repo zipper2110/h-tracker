@@ -1,9 +1,19 @@
 'use client';
 
 import { useTheme } from '@/context/ThemeContext';
+import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="w-10 h-10"></div>; // Placeholder with same dimensions
+  }
 
   return (
     <button

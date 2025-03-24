@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { MOOD_LEVELS, ACTIVITY_LEVELS, SWEET_FOOD_LEVELS, LevelOption } from '@/lib/constants';
+import { SELF_FEELING_LEVELS, ACTIVITY_LEVELS, SWEET_FOOD_LEVELS, OVEREATING_LEVELS, SLEEP_RECOVERY_LEVELS, LevelOption } from '@/lib/constants';
+import LevelSelector from './LevelSelector';
 
 interface EntryFormProps {
   onSubmit: (data: EntryData) => void;
@@ -9,7 +10,7 @@ interface EntryFormProps {
 
 export interface EntryData {
   date: string;
-  mood: {
+  selfFeeling: {
     value: number;
     label: string;
   };
@@ -21,6 +22,14 @@ export interface EntryData {
     value: number;
     label: string;
   };
+  overeating: {
+    value: number;
+    label: string;
+  };
+  sleepRecovery: {
+    value: number;
+    label: string;
+  };
 }
 
 export default function EntryForm({ onSubmit, initialData, isLoading = false }: EntryFormProps) {
@@ -28,9 +37,11 @@ export default function EntryForm({ onSubmit, initialData, isLoading = false }: 
   
   const [formData, setFormData] = useState<EntryData>({
     date: today,
-    mood: MOOD_LEVELS[4], // Default to "okay"
+    selfFeeling: SELF_FEELING_LEVELS[4], // Default to "okay"
     activity: ACTIVITY_LEVELS[0], // Default to "none"
     sweetFood: SWEET_FOOD_LEVELS[0], // Default to "none"
+    overeating: OVEREATING_LEVELS[0], // Default to "not at all"
+    sleepRecovery: SLEEP_RECOVERY_LEVELS[3], // Default to "okay"
   });
 
   useEffect(() => {
@@ -44,12 +55,12 @@ export default function EntryForm({ onSubmit, initialData, isLoading = false }: 
     onSubmit(formData);
   };
 
-  const handleLevelChange = (type: 'mood' | 'activity' | 'sweetFood', value: number) => {
+  const handleLevelChange = (type: keyof Omit<EntryData, 'date'>, value: number) => {
     let levels: LevelOption[];
     
     switch (type) {
-      case 'mood':
-        levels = MOOD_LEVELS;
+      case 'selfFeeling':
+        levels = SELF_FEELING_LEVELS;
         break;
       case 'activity':
         levels = ACTIVITY_LEVELS;
@@ -57,6 +68,14 @@ export default function EntryForm({ onSubmit, initialData, isLoading = false }: 
       case 'sweetFood':
         levels = SWEET_FOOD_LEVELS;
         break;
+      case 'overeating':
+        levels = OVEREATING_LEVELS;
+        break;
+      case 'sleepRecovery':
+        levels = SLEEP_RECOVERY_LEVELS;
+        break;
+      default:
+        return;
     }
     
     const selectedLevel = levels.find(level => level.value === value) || levels[0];
@@ -82,76 +101,52 @@ export default function EntryForm({ onSubmit, initialData, isLoading = false }: 
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Mood
-          </label>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-            {MOOD_LEVELS.map((level) => (
-              <button
-                key={level.value}
-                type="button"
-                onClick={() => handleLevelChange('mood', level.value)}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  formData.mood.value === level.value
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {level.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <LevelSelector 
+          label="Self-Feeling"
+          levels={SELF_FEELING_LEVELS}
+          selectedValue={formData.selfFeeling.value}
+          onChange={(value) => handleLevelChange('selfFeeling', value)}
+          columns={5}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Physical Activity
-          </label>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-            {ACTIVITY_LEVELS.map((level) => (
-              <button
-                key={level.value}
-                type="button"
-                onClick={() => handleLevelChange('activity', level.value)}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  formData.activity.value === level.value
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {level.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <LevelSelector 
+          label="Activity"
+          levels={ACTIVITY_LEVELS}
+          selectedValue={formData.activity.value}
+          onChange={(value) => handleLevelChange('activity', value)}
+          columns={6}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Sweet Food
-          </label>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-            {SWEET_FOOD_LEVELS.map((level) => (
-              <button
-                key={level.value}
-                type="button"
-                onClick={() => handleLevelChange('sweetFood', level.value)}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  formData.sweetFood.value === level.value
-                    ? 'bg-red-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {level.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <LevelSelector 
+          label="Sweet Food"
+          levels={SWEET_FOOD_LEVELS}
+          selectedValue={formData.sweetFood.value}
+          onChange={(value) => handleLevelChange('sweetFood', value)}
+          columns={7}
+        />
 
+        <LevelSelector 
+          label="Overeating"
+          levels={OVEREATING_LEVELS}
+          selectedValue={formData.overeating.value}
+          onChange={(value) => handleLevelChange('overeating', value)}
+          columns={6}
+        />
+
+        <LevelSelector 
+          label="Sleep Recovery"
+          levels={SLEEP_RECOVERY_LEVELS}
+          selectedValue={formData.sleepRecovery.value}
+          onChange={(value) => handleLevelChange('sleepRecovery', value)}
+          columns={7}
+        />
+      </div>
+
+      <div className="flex justify-end">
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Saving...' : 'Save Entry'}
         </button>

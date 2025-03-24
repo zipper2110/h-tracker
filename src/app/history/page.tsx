@@ -11,9 +11,11 @@ import ThemeToggle from '@/components/ThemeToggle';
 interface Entry {
   _id: string;
   date: string;
-  mood: { value: number; label: string };
+  selfFeeling: { value: number; label: string };
   activity: { value: number; label: string };
   sweetFood: { value: number; label: string };
+  overeating: { value: number; label: string };
+  sleepRecovery: { value: number; label: string };
 }
 
 type TimeRange = 'week' | 'month' | 'year';
@@ -23,6 +25,7 @@ export default function History() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<TimeRange>('week');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   
   useEffect(() => {
     fetchEntries();
@@ -76,6 +79,27 @@ export default function History() {
   
   const filteredEntries = getFilteredEntries();
   
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingId(id);
+      const response = await fetch(`/api/entries/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete entry');
+      }
+      
+      // Remove the entry from the local state
+      setEntries(entries.filter(entry => entry._id !== id));
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      setError('Failed to delete entry. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900">
@@ -96,26 +120,6 @@ export default function History() {
     );
   }
   
-  if (error) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-900">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">History</h1>
-              <p className="text-gray-600 dark:text-gray-400">View your tracking history and trends</p>
-            </div>
-            <ThemeToggle />
-          </div>
-
-          <div className="p-4 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-md">
-            {error}
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -126,6 +130,12 @@ export default function History() {
           </div>
           <ThemeToggle />
         </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200 rounded-md">
+            {error}
+          </div>
+        )}
 
         <div className="space-y-8">
           {/* Time Range Selector */}
@@ -192,8 +202,8 @@ export default function History() {
                   <Legend />
                   <Line 
                     type="monotone" 
-                    dataKey="mood.value" 
-                    name="Mood" 
+                    dataKey="selfFeeling.value" 
+                    name="Self-Feeling" 
                     stroke="#6366F1" 
                     strokeWidth={2}
                   />
@@ -211,6 +221,20 @@ export default function History() {
                     stroke="#EF4444" 
                     strokeWidth={2}
                   />
+                  <Line 
+                    type="monotone" 
+                    dataKey="overeating.value" 
+                    name="Overeating" 
+                    stroke="#F59E0B" 
+                    strokeWidth={2}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="sleepRecovery.value" 
+                    name="Sleep Recovery" 
+                    stroke="#8B5CF6" 
+                    strokeWidth={2}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -226,13 +250,22 @@ export default function History() {
                       Date
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Mood
+                      Self-Feeling
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Activity
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Sweet Food
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Overeating
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Sleep Recovery
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -244,7 +277,7 @@ export default function History() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                          {entry.mood.label} ({entry.mood.value})
+                          {entry.selfFeeling.label} ({entry.selfFeeling.value})
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
@@ -256,6 +289,25 @@ export default function History() {
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                           {entry.sweetFood.label} ({entry.sweetFood.value})
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                          {entry.overeating.label} ({entry.overeating.value})
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          {entry.sleepRecovery.label} ({entry.sleepRecovery.value})
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <button
+                          onClick={() => handleDelete(entry._id)}
+                          disabled={deletingId === entry._id}
+                          className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {deletingId === entry._id ? 'Deleting...' : 'Delete'}
+                        </button>
                       </td>
                     </tr>
                   ))}

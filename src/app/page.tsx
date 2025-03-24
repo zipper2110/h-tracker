@@ -64,7 +64,7 @@ export default function Home() {
 
         {message && (
           <div className={`mb-6 p-4 rounded-md ${
-            message.includes('success') 
+            message.type === 'success'
               ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200' 
               : 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200'
           }`}>

@@ -55,10 +55,11 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // DELETE - Delete an entry
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   try {
+    const { id } = await params;
     await connectToDatabase();
-    const deletedEntry = await Entry.findByIdAndDelete(params.id);
+    const deletedEntry = await Entry.findByIdAndDelete(id);
     
     if (!deletedEntry) {
       return NextResponse.json(
